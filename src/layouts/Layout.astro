@@ -1,5 +1,8 @@
 ---
 import "../styles/global.css";
+
+import ToTopButton from "@/components/ToTopButton.tsx";
+import { GlobalIcons } from "@/assets/icons";
 ---
 
 <!doctype html>
@@ -14,6 +17,9 @@ import "../styles/global.css";
   </head>
   <body>
     <slot />
+    <ToTopButton client:load>
+      <GlobalIcons.arrowUp />
+    </ToTopButton>
   </body>
 </html>
 
@@ -25,7 +31,10 @@ import "../styles/global.css";
     height: 100%;
   }
 
-  body, *, *::before, *::after {
+  body,
+  *,
+  *::before,
+  *::after {
     padding: 0;
     box-sizing: border-box;
   }

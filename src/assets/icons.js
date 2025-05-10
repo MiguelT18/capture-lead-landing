@@ -10,6 +10,7 @@ import ShieldCheck from "./icons/ShieldCheck.astro"
 import LightBulb from "./icons/LightBulb.astro"
 import Rocket from "./icons/Rocket.astro"
 import Hearth from "./icons/Hearth.astro"
+import Arrow from "./icons/Arrow.astro"
 
 export const BenefitIcons = {
   book: BookIcon,
@@ -34,4 +35,8 @@ export const TargetIcons = {
 
 export const FooterIcons = {
   hearth: Hearth
+}
+
+export const GlobalIcons = {
+  arrowUp: Arrow,
 }
