@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Recursos exclusivos",
+    "description": "Accede a tutoriales, ejemplos de código y recursos que no encontrarás en ningún otro lugar.",
+    "iconKey": "code"
+  },
+  {
+    "title": "Comunidad activa",
+    "description": "Conecta con otros desarrolladores apasionados por JavaScript y comparte conocimientos.",
+    "iconKey": "community"
+  },
+  {
+    "title": "Aprendizaje continuo",
+    "description": "Mantente actualizado con las últimas tendencias y mejores prácticas en el ecosistema JavaScript.",
+    "iconKey": "book"
+  },
+  {
+    "title": "Soporte en tiempo real",
+    "description": "Obtén ayuda inmediata con tus dudas y problemas de código de parte de la comunidad.",
+    "iconKey": "chat"
+  },
+  {
+    "title": "Retos semanales",
+    "description": "Mejora tus habilidades participando en desafíos de código y proyectos prácticos.",
+    "iconKey": "medal"
+  },
+  {
+    "title": "Oportunidades laborales",
+    "description": "Accede a ofertas de trabajo exclusivas compartidas por miembros de la comunidad.",
+    "iconKey": "thunder"
+  }
+]

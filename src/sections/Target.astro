@@ -1,0 +1,84 @@
+---
+import { TargetIcons } from "@/assets/icons";
+const targetData = [
+  {
+    title: "Tienes conocimientos básicos de JavaScript",
+    description:
+      "Si ya conoces los fundamentos de JavaScript y quieres profundizar tus conocimientos, este es tu lugar. Aprenderás técnicas avanzadas y mejores prácticas.",
+    iconKey: "code",
+  },
+  {
+    title: "Quieres mejorar tus habilidades",
+    description:
+      "Si buscas pasar al siguiente nivel en tu carrera como desarrollador, nuestra comunidad te proporcionará los recursos y el apoyo necesarios para crecer.",
+    iconKey: "lightbulb",
+  },
+  {
+    title: "Eres desarrollador avanzado",
+    description:
+      "Si ya tienes experiencia sólida, podrás compartir conocimientos, resolver dudas de otros miembros y mantenerte actualizado con las últimas tendencias.",
+    iconKey: "rocket",
+  },
+];
+
+interface TargetJsonItem {
+  title: string;
+  description: string;
+  iconKey: IconKey;
+}
+
+type IconKey = keyof typeof TargetIcons;
+
+const targets = (targetData as TargetJsonItem[]).map((item) => {
+  if (!TargetIcons[item.iconKey]) {
+    throw new Error(`Icon key "${item.iconKey}" no es válida.`);
+  }
+
+  return {
+    ...item,
+    icon: TargetIcons[item.iconKey],
+  };
+});
+---
+
+<section class="bg-white px-8 py-20">
+  <div class="w-full max-w-5xl mx-auto text-center">
+    <h1 class="[&>span]:text-[#0088cc] font-bold text-3xl md:text-5xl">
+      ¿A quién está <span>dirigido</span>?
+    </h1>
+    <p
+      class="text-[#4b5563] text-lg lg:text-xl mt-4 w-fit md:max-w-[60%] text-pretty mx-auto"
+    >
+      Nuestra comunidad es perfecta para ti si...
+    </p>
+  </div>
+
+  <div
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 max-w-5xl mx-auto"
+  >
+    {
+      /* Use the map function to iterate over the targetData array and render each target */
+    }
+    {
+      targets.map((item) => {
+        const Icon = item.icon;
+        return (
+          <article class="bg-gray-800 rounded-sm p-8 text-white shadow-lg border border-gray-700">
+            <div class="mb-4">
+              <Icon />
+            </div>
+            <h3 class="text-xl font-bold mb-2">{item.title}</h3>
+            <p class="text-gray-300 text-balance">{item.description}</p>
+          </article>
+        );
+      })
+    }
+  </div>
+
+  <p
+    class="text-2xl font-medium text-gray-900 max-w-3xl mx-auto text-center mt-12"
+  >
+    No importa tu nivel actual, si tienes pasión por JavaScript y ganas de
+    aprender, ¡hay un lugar para ti en nuestra comunidad!
+  </p>
+</section>

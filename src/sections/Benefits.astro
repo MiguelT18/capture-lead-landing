@@ -1,0 +1,61 @@
+---
+import benefitsData from "@/assets/data/benefits.json";
+import { BenefitIcons } from "@/assets/icons";
+
+interface BenefitJsonItem {
+  title: string;
+  description: string;
+  iconKey: IconKey;
+}
+
+type IconKey = keyof typeof BenefitIcons;
+
+const benefits = (benefitsData as BenefitJsonItem[]).map((item) => {
+  if (!BenefitIcons[item.iconKey]) {
+    throw new Error(`Icon key "${item.iconKey}" no es válida.`);
+  }
+
+  return {
+    ...item,
+    icon: BenefitIcons[item.iconKey],
+  };
+});
+---
+
+<section class="bg-[#f3f4f6] px-8 py-20">
+  <div class="w-full max-w-5xl mx-auto text-center">
+    <h1 class="[&>span]:text-[#0088cc] font-bold text-3xl md:text-5xl">
+      Beneficios de unirte a nuestra <span>comunidad</span>
+    </h1>
+    <p
+      class="text-[#4b5563] text-lg lg:text-xl mt-4 w-fit md:max-w-[60%] text-pretty mx-auto"
+    >
+      Descubre todo lo que puedes obtener al formar parte de nuestro grupo de
+      Telegram
+    </p>
+  </div>
+
+  <div
+    class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12 max-w-5xl mx-auto"
+  >
+    {
+      /* Use the map function to iterate over the benefits array and render each benefit */
+    }
+    {
+      benefits.map((benefit) => {
+        const Icon = benefit.icon;
+        return (
+          <article class="bg-white rounded-sm p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300">
+            <div class="mb-4">
+              <Icon />
+            </div>
+            <h3 class="text-xl font-bold mb-2 text-gray-900">
+              {benefit.title}
+            </h3>
+            <p class="text-gray-600">{benefit.description}</p>
+          </article>
+        );
+      })
+    }
+  </div>
+</section>

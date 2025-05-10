@@ -1,0 +1,57 @@
+---
+import { RuleIcons } from "@assets/icons";
+import rulesData from "@/assets/data/rules.json";
+---
+
+<section class="bg-[#f9fafb] px-8 py-20">
+  <div class="w-full max-w-5xl mx-auto text-center">
+    <h1 class="[&>span]:text-[#0088cc] font-bold text-3xl md:text-5xl">
+      Reglas de nuestra <span>comunidad</span>
+    </h1>
+    <p class="text-[#4b5563] text-lg lg:text-xl mt-4 w-fit text-pretty mx-auto">
+      Para mantener un ambiente positivo y productivo, seguimos estas reglas
+    </p>
+  </div>
+
+  <div
+    class="bg-white p-5 md:p-8 rounded-sm max-w-4xl mx-auto mt-12 shadow-sm border border-gray-200"
+  >
+    <header class="flex mb-6 flex-col items-start gap-2">
+      <RuleIcons.warning />
+      <p class="text-lg font-medium text-balance text-gray-900">
+        Al unirte a nuestro grupo, aceptas cumplir con las siguientes normas:
+      </p>
+    </header>
+
+    {
+      /* Use the map function to iterate over the rules array and render each rule */
+    }
+    {
+      rulesData.map((rule) => (
+        <div>
+          <div class="flex items-center gap-4">
+            {/* Use the RuleIcons component to render the icon for each rule */}
+            <span class="size-fit block">
+              <RuleIcons.shielCheck />
+            </span>
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900">{rule.title}</h2>
+              <p class="text-gray-700">{rule.description}</p>
+            </div>
+          </div>
+          <hr class="my-4 text-gray-300" />
+        </div>
+      ))
+    }
+
+    <footer
+      class="border-2 border-yellow-400 bg-yellow-500/5 rounded-md p-4 mt-6"
+    >
+      <p class="flex items-center text-gray-900">
+        <RuleIcons.check />
+        El incumplimiento de estas reglas puede resultar en una advertencia o expulsión
+        del grupo, dependiendo de la gravedad de la infracción.
+      </p>
+    </footer>
+  </div>
+</section>

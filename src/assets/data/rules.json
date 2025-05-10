@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Respeto mutuo",
+    "description": "Trata a todos los miembros con respeto. No se tolerará ningún tipo de acoso o comportamiento tóxico."
+  },
+  {
+    "title": "Contenido relevante",
+    "description": "Comparte solo contenido relacionado con JavaScript y desarrollo web."
+  },
+  {
+    "title": "No spam",
+    "description": "Evita publicar enlaces promocionales o contenido no solicitado."
+  },
+  {
+    "title": "Ayuda constructiva",
+    "description": "Al responder preguntas, sé constructivo y evita respuestas condescendientes."
+  },
+  {
+    "title": "Código formateado",
+    "description": "Usa bloques de código al compartir ejemplos para facilitar la lectura."
+  }
+]
