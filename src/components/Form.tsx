@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Modal from "./Modal";
 import { useForm } from "react-hook-form"
+import axios from "axios"
 
 export default function Form({ children }: any) {
   const [open, setOpen] = useState(false);
@@ -21,14 +22,18 @@ export default function Form({ children }: any) {
 
   const onSubmitBasic = async (data: any) => {
     try {
-      // const res = await fetch("/api/users", {
-      //   method: "POST",
-      //   body: JSON.stringify({ ...data, opinion: "" }),
-      //   headers: { "Content-Type": "application/json" },
-      // });
-      // const result = await res.json();
-      // setCreatedId(result._id);
-      console.log(data);
+      const res = await axios.post("/api/users", {
+        ...data,
+        opinion: "",
+      })
+
+      const result = res.data;
+      setCreatedId(result._id)
+
+      if (!result) {
+        console.error("Error al crear el usuario:", result);
+        return;
+      }
 
       setOpen(true);
       document.body.style.overflow = "hidden";
@@ -41,13 +46,9 @@ export default function Form({ children }: any) {
     if (!createdId) return;
 
     try {
-      // await fetch(`/api/users/${createdId}`, {
-      //   method: "PATCH",
-      //   body: JSON.stringify({ opinion: data.opinion }),
-      //   headers: { "Content-Type": "application/json" },
-      // });
-
-      console.log(data);
+      await axios.patch(`/api/users/${createdId}`, {
+        opinion: data.opinion,
+      });
 
       resetOpinion();
       setOpen(false);
@@ -55,6 +56,7 @@ export default function Form({ children }: any) {
     } catch (err) {
       console.error("Error al actualizar la opinión:", err);
     }
+
   };
 
   const handleCloseModal = () => {
@@ -79,7 +81,7 @@ export default function Form({ children }: any) {
               placeholder="(max. 255 caracteres)"
             ></textarea>
             {errorsOpinion.opinion && (
-              <span className="text-red-500 text-sm">{errorsOpinion.opinion.message}</span>
+              <span className="text-red-500 text-sm">{errorsOpinion.opinion?.message?.toString()}</span>
             )}
           </div>
 
@@ -104,7 +106,7 @@ export default function Form({ children }: any) {
             autoComplete="off"
             placeholder="Nombre completo"
           />
-          {errorsBasic.name && <span className="text-red-500 text-sm">{errorsBasic.name.message}</span>}
+          {errorsBasic.name && <span className="text-red-500 text-sm">{errorsBasic.name?.message?.toString()}</span>}
         </div>
 
         <label htmlFor="email" className="text-gray-300">Correo electrónico</label>
@@ -122,7 +124,7 @@ export default function Form({ children }: any) {
             autoComplete="off"
             placeholder="Correo electrónico"
           />
-          {errorsBasic.email && <span className="text-red-500 text-sm">{errorsBasic.email.message}</span>}
+          {errorsBasic.email && <span className="text-red-500 text-sm">{errorsBasic.email?.message?.toString()}</span>}
         </div>
 
         <button

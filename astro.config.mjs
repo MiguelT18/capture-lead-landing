@@ -4,6 +4,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 import react from "@astrojs/react";
 
+import vercel from "@astrojs/vercel";
+
 // https://astro.build/config
 export default defineConfig({
   vite: {
@@ -14,5 +16,19 @@ export default defineConfig({
   enabled: false
 },
 
-  integrations: [react()]
+  integrations: [react()],
+  prefetch: false,
+  adapter: vercel({
+    webAnalytics: {
+      enabled: true,
+    }
+  }),
+  output: "server",
+  session: {
+    driver: "mongodb",
+    options: {
+      connectionString: process.env.MONGODB_URI ?? "",
+      databaseName: process.env.MONGODB_DB_NAME ?? "",
+    }
+  }
 });

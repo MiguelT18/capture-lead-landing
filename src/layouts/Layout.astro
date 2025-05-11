@@ -3,6 +3,7 @@ import "../styles/global.css";
 
 import ToTopButton from "@/components/ToTopButton.tsx";
 import { GlobalIcons } from "@/assets/icons";
+import { Font } from "astro:assets";
 ---
 
 <!doctype html>
@@ -13,7 +14,6 @@ import { GlobalIcons } from "@/assets/icons";
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>Comunidad de Telegram</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
   <body>
     <slot />
