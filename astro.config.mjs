@@ -13,8 +13,8 @@ export default defineConfig({
   },
 
   devToolbar: {
-  enabled: false
-},
+    enabled: false
+  },
 
   integrations: [react()],
   prefetch: false,
@@ -27,8 +27,8 @@ export default defineConfig({
   session: {
     driver: "mongodb",
     options: {
-      connectionString: process.env.MONGODB_URI ?? "",
-      databaseName: process.env.MONGODB_DB_NAME ?? "",
+      connectionString: import.meta.env.MONGODB_URI,
+      databaseName: import.meta.env.MONGODB_DB_NAME,
     }
   }
 });

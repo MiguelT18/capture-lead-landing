@@ -26,6 +26,8 @@ export default function Form({ children }: any) {
     try {
       setLoading(true);
 
+      console.log('🧾 Payload que se enviará:', { data });
+
       const res = await axios.post("/api/users", {
         ...data,
         opinion: "",
@@ -39,8 +41,18 @@ export default function Form({ children }: any) {
         return;
       }
 
-      setLoading(false);
+      try {
+        await axios.post("/api/brevo/addContact", {
+          email: data.email,
+          firstName: data.name.split(' ')[0],
+          lastName: data.name.split(' ').slice(1).join(' '),
+        })
+      } catch (err) {
+        console.error("Error al agregar el contacto a Brevo:", err);
+        return;
+      }
 
+      setLoading(false);
       resetBasic();
       setOpen(true);
       document.body.style.overflow = "hidden";
