@@ -1,9 +1,9 @@
 ---
 import "../styles/global.css";
 
-import ToTopButton from "@/components/ToTopButton.tsx";
-import { GlobalIcons } from "@/assets/icons";
-import { Font } from "astro:assets";
+import ToTopButton from "@components/ToTopButton.tsx";
+import Notification from "@/components/Notification.astro";
+import { GlobalIcons } from "@assets/icons.js";
 ---
 
 <!doctype html>
@@ -16,12 +16,44 @@ import { Font } from "astro:assets";
     <title>Comunidad de Telegram</title>
   </head>
   <body>
+    <Notification />
     <slot />
-    <ToTopButton client:load>
+    <ToTopButton client:only="react">
       <GlobalIcons.arrowUp />
     </ToTopButton>
   </body>
 </html>
+
+<script>
+  window.addEventListener("show-notification", (event) => {
+    const { type, message } = (event as CustomEvent).detail;
+    const notification = document.getElementById("notification") as HTMLElement;
+    if (!notification) return;
+
+    const notificationTypes = {
+      success: "bg-green-100 text-green-800",
+      error: "bg-red-100 text-red-800",
+      info: "bg-blue-100 text-blue-800",
+      warning: "bg-yellow-100 text-yellow-800",
+    };
+
+    const spanElement = notification.querySelector("span");
+    if (spanElement) {
+      spanElement.innerHTML = message;
+    }
+    notification.className = `"transition-opacity duration-100 fixed bottom-5 right-5 z-50 p-4 text-sm rounded-lg shadow-md pointer-events-none opacity-0 ${notificationTypes[type as keyof typeof notificationTypes]}`;
+
+    void notification.offsetWidth; // trigger reflow
+
+    notification.classList.remove("opacity-0");
+    notification.classList.add("opacity-100");
+
+    setTimeout(() => {
+      notification.classList.remove("opacity-100");
+      notification.classList.add("opacity-0");
+    }, 3000);
+  });
+</script>
 
 <style>
   html,

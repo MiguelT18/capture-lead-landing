@@ -5,15 +5,30 @@ import { ObjectId } from "mongodb";
 
 export async function POST({ request }: APIContext) {
   const body = await request.json();
-  const { name, email } = body;
+  const { name, lastName, email } = body;
+
+  const fullName = `${name} ${lastName}`;
 
   const db = await connectToDatabase();
-  const result = await db.collection("users").insertOne({ name, email, opinion: "" });
 
-  return new Response(JSON.stringify({ _id: result.insertedId }), {
-    status: 201,
-    headers: { "Content-Type": "application/json" },
+  const existingEmail = await db.collection("users").findOne({ email });
+  if (existingEmail) {
+    return new Response(
+      JSON.stringify({ error: "El correo electrónico ya fue usado" }),
+      { status: 409, headers: { "Content-Type": "application/json" } }
+    );
+  }
+  
+  const result = await db.collection("users").insertOne({
+    name: fullName,
+    email,
+    opinion: ""
   });
+
+  return new Response(
+    JSON.stringify({ success: "Usuario registrado correctamente", _id: result.insertedId }),
+    { status: 201, headers: { "Content-Type": "application/json" } }
+  );
 }
 
 export async function PATCH({ request, params }: APIContext) {
@@ -23,7 +38,10 @@ export async function PATCH({ request, params }: APIContext) {
   const isValidObjectId = userId ? /^[a-fA-F0-9]{24}$/.test(userId) : false;
 
   if (!userId || !isValidObjectId) {
-    return new Response("Invalid user ID", { status: 400 });
+    return new Response(
+      JSON.stringify({ error: "ID de usuario inválido" }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
   }
 
   const db = await connectToDatabase();
@@ -36,12 +54,20 @@ export async function PATCH({ request, params }: APIContext) {
     );
 
     if (result.matchedCount === 0) {
-      return new Response("User not found", { status: 404 });
+      return new Response(
+        JSON.stringify({ error: "Usuario no encontrado" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
     }
 
-    return new Response("User opinion updated", { status: 200 });
+    return new Response(
+      JSON.stringify({ success: "Usuario actualizado correctamente" }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
   } catch (err) {
-    console.error("Error updating user:", err);
-    return new Response("Error updating user", { status: 500 });
+    return new Response(
+      JSON.stringify({ error: "Error al actualizar el usuario" }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
   }
 }

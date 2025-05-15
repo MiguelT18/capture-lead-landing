@@ -6,7 +6,7 @@ export const POST: APIRoute = async ({ request }) => {
     body = await request.json();
   } catch (err) {
     return new Response(
-      JSON.stringify({ error: 'Cuerpo inválido en la solicitud' }),
+      JSON.stringify({ error: '⚠️ Cuerpo inválido en la solicitud' }),
       { status: 400 }
     );
   }
@@ -19,8 +19,6 @@ export const POST: APIRoute = async ({ request }) => {
       { status: 400 }
     );
   }
-
-  console.log('📨 Datos recibidos del cliente:', { email, firstName, lastName });
 
   try {
     const brevoRes = await fetch('https://api.brevo.com/v3/contacts', {

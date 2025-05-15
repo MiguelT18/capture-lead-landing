@@ -2,6 +2,7 @@ import { useState } from "react";
 import Modal from "./Modal";
 import { useForm } from "react-hook-form"
 import axios from "axios"
+import formatName from "@/utils/formatName";
 
 export default function Form({ children }: any) {
   const [open, setOpen] = useState(false);
@@ -22,42 +23,63 @@ export default function Form({ children }: any) {
     reset: resetOpinion,
   } = useForm();
 
-  const onSubmitBasic = async (data: any) => {
+  const onSubmitBasic = async (data: any, event: any) => {
+    event?.preventDefault();
     try {
       setLoading(true);
 
-      console.log('🧾 Payload que se enviará:', { data });
-
       const res = await axios.post("/api/users", {
-        ...data,
+        name: formatName(data.name),
+        lastName: formatName(data.lastName),
+        email: data.email.trim(),
         opinion: "",
       })
 
       const result = res.data;
       setCreatedId(result._id)
 
-      if (!result) {
-        console.error("Error al crear el usuario:", result);
-        return;
-      }
-
       try {
         await axios.post("/api/brevo/addContact", {
-          email: data.email,
-          firstName: data.name.split(' ')[0],
-          lastName: data.name.split(' ').slice(1).join(' '),
+          firstName: formatName(data.name),
+          lastName: formatName(data.lastName),
+          email: data.email.trim(),
         })
-      } catch (err) {
-        console.error("Error al agregar el contacto a Brevo:", err);
-        return;
+      } catch (err: any) {
+        setLoading(false);
+        return new Response(
+          "Error al agregar el contacto a Brevo",
+          { status: 409, headers: { "Content-Type": "application/json" } }
+        );
       }
+
+      window.dispatchEvent(
+        new CustomEvent("show-notification", {
+          detail: {
+            type: "success",
+            message: result.success,
+          },
+        })
+      )
 
       setLoading(false);
       resetBasic();
       setOpen(true);
       document.body.style.overflow = "hidden";
-    } catch (err) {
-      console.error("Error al crear el hash:", err);
+    } catch (err: any) {
+      setLoading(false);
+
+      if (axios.isAxiosError(err) && err.response) {
+        window.dispatchEvent(
+          new CustomEvent("show-notification", {
+            detail: {
+              type: "error",
+              message: err.response.data.error,
+            },
+          })
+        )
+      } else {
+        console.error("Error desconocido:", err);
+      }
     }
   };
 
@@ -71,6 +93,15 @@ export default function Form({ children }: any) {
         opinion: data.opinion,
       });
 
+      window.dispatchEvent(
+        new CustomEvent("show-notification", {
+          detail: {
+            type: "success",
+            message: "¡Gracias por tu opinión!",
+          },
+        })
+      )
+
       resetOpinion();
       setOpen(false);
       document.body.style.overflow = "auto";
@@ -78,10 +109,21 @@ export default function Form({ children }: any) {
       setLoading(false);
 
       window.location.href = "https://t.me/+fFUlQFLssnFjMzBh"
-    } catch (err) {
-      console.error("Error al actualizar la opinión:", err);
+    } catch (err: any) {
+      setLoading(false);
+      if (axios.isAxiosError(err) && err.response) {
+        window.dispatchEvent(
+          new CustomEvent("show-notification", {
+            detail: {
+              type: "error",
+              message: err.response.data.error,
+            },
+          })
+        )
+      } else {
+        console.error("Error desconocido:", err);
+      }
     }
-
   };
 
   const handleCloseModal = () => {
@@ -92,17 +134,21 @@ export default function Form({ children }: any) {
 
   return (
     <>
-      {/* Aquí se puede mostrar el modal si 'open' es true */}
       <Modal isOpen={open} onClose={handleCloseModal}>
         <form onSubmit={handleSubmitOpinion(onSubmitOpinion)}>
           <h3 className="text-xl text-center text-white font-semibold mb-2">¿Qué te motivó a aprender programación?</h3>
-          <p className="text-sm text-gray-400 mb-1">
+          <p className="max-md:text-sm text-md text-gray-400 mb-1">
             Tu opinión es muy importante para nosotros. Por favor, compártela con nosotros y ayúdanos a mejorar.
           </p>
           <label htmlFor="opinion" className="text-gray-300 block mb-1">Exprésate todo lo que quieras aquí</label>
           <div className="mb-4 mt-1">
             <textarea
               {...registerOpinion("opinion", { required: "Tu opinión no puede ir vacia" })}
+              onKeyDown={(e) => {
+                if ((e.key === "Enter" && (e.ctrlKey || e.metaKey)) && !loading) {
+                  handleSubmitOpinion(onSubmitOpinion)();
+                }
+              }}
               className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500 focus:border-[#0088cc] transition-colors outline-none rounded-sm w-full p-2 resize-none"
               autoComplete="off"
               rows={8}
@@ -122,20 +168,48 @@ export default function Form({ children }: any) {
       </Modal>
 
       <form onSubmit={handleSubmitBasic(onSubmitBasic)}>
-        <h2 className="text-2xl font-bold text-white mb-6 max-md:text-center">
+        <h2 className="text-2xl font-bold text-white mb-4 max-md:text-center">
           Únete a nuestro grupo de Telegram
         </h2>
 
-        <label htmlFor="name" className="text-gray-300">Nombre completo</label>
         <div className="mb-4 mt-1">
+          <label htmlFor="name" className="text-gray-300">Nombres</label>
           <input
-            {...registerBasic("name", { required: "El nombre completo es obligatorio" })}
+            {...registerBasic(
+              "name",
+              {
+                required: "Tus nombres son obligatorios",
+                pattern: {
+                  value: /^[\p{L}\s]+$/u,
+                  message: "Solo se permiten letras"
+                }
+              })}
             type="text"
             className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500 focus:border-[#0088cc] transition-colors outline-none rounded-sm w-full p-2"
             autoComplete="off"
-            placeholder="Nombre completo"
+            placeholder="Nombres"
           />
           {errorsBasic.name && <span className="text-red-500 text-sm">{errorsBasic.name?.message?.toString()}</span>}
+        </div>
+
+        <label htmlFor="name" className="text-gray-300">Apellidos</label>
+        <div className="mb-4 mt-1">
+          <input
+            {...registerBasic(
+              "lastName",
+              {
+                required: "Tus apellidos son obligatorios",
+                pattern: {
+                  value: /^[\p{L}\s]+$/u,
+                  message: "Solo se permiten letras"
+                }
+              })}
+            type="text"
+            className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-500 focus:border-[#0088cc] transition-colors outline-none rounded-sm w-full p-2"
+            autoComplete="off"
+            placeholder="Apellidos"
+          />
+          {errorsBasic.lastName && <span className="text-red-500 text-sm">{errorsBasic.lastName?.message?.toString()}</span>}
         </div>
 
         <label htmlFor="email" className="text-gray-300">Correo electrónico</label>
@@ -144,7 +218,7 @@ export default function Form({ children }: any) {
             {...registerBasic("email", {
               required: "El correo electrónico es obligatorio",
               pattern: {
-                value: /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/,
+                value: /^[^\s@]+(\.[^\s@]+)*@[^\s@]+\.[a-zA-Z]{2,7}$/,
                 message: "Correo inválido",
               },
             })}
