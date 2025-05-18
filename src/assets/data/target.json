@@ -1,0 +1,17 @@
+[
+  {
+    "title": "Tienes conocimientos básicos de JavaScript",
+    "description": "Si ya conoces los fundamentos de JavaScript y quieres profundizar tus conocimientos, este es tu lugar. Aprenderás técnicas avanzadas y mejores prácticas.",
+    "iconKey": "code"
+  },
+  {
+    "title": "Quieres mejorar tus habilidades",
+    "description": "Si buscas pasar al siguiente nivel en tu carrera como desarrollador, nuestra comunidad te proporcionará los recursos y el apoyo necesario para crecer.",
+    "iconKey": "lightbulb"
+  },
+  {
+    "title": "Eres desarrollador avanzado",
+    "description": "Si ya tienes experiencia sólida, podrás compartir conocimientos, resolver dudas de otros miembros y mantenerte actualizado con las últimas tendencias.",
+    "iconKey": "rocket"
+  }
+]

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import { useForm } from "react-hook-form"
 import axios from "axios"
 import formatName from "@/utils/formatName";
+import { getUTMParams, saveUTMToLocalStorage, getSavedUTMFromLocalStorage } from "@/utils/getUTMParams";
 
 export default function Form({ children }: any) {
   const [open, setOpen] = useState(false);
@@ -23,20 +24,39 @@ export default function Form({ children }: any) {
     reset: resetOpinion,
   } = useForm();
 
+  useEffect(() => {
+    const utm = getUTMParams()
+    const anyUtmExists = Object.values(utm).some(val => val !== null)
+    const alreadySaved = localStorage.getItem("utm_params")
+    if (anyUtmExists && !alreadySaved) {
+      saveUTMToLocalStorage()
+    }
+  }, [])
+
   const onSubmitBasic = async (data: any, event: any) => {
     event?.preventDefault();
     try {
       setLoading(true);
+
+      const utm = getSavedUTMFromLocalStorage()
 
       const res = await axios.post("/api/users", {
         name: formatName(data.name),
         lastName: formatName(data.lastName),
         email: data.email.trim(),
         opinion: "",
+        utm,
+        referrer: document.referrer || ""
       })
 
       const result = res.data;
       setCreatedId(result._id)
+
+      // 💾 Guardar ID en localStorage
+      localStorage.setItem("registeredUserId", result._id)
+
+      // 🍪 Guardar cookie simple (cliente)
+      document.cookie = `registeredUserID=${result._id}; path=/; max-age=31536000` // 1 año
 
       try {
         await axios.post("/api/brevo/addContact", {
@@ -138,7 +158,7 @@ export default function Form({ children }: any) {
         <form onSubmit={handleSubmitOpinion(onSubmitOpinion)}>
           <h3 className="text-xl text-center text-white font-semibold mb-2">¿Qué te motivó a aprender programación?</h3>
           <p className="max-md:text-sm text-md text-gray-400 mb-1">
-            Tu opinión es muy importante para nosotros. Por favor, compártela con nosotros y ayúdanos a mejorar.
+            Tu opinión es muy importante, me gustaría saber qué fue lo que te motivó a aprender programación
           </p>
           <label htmlFor="opinion" className="text-gray-300 block mb-1">Exprésate todo lo que quieras aquí</label>
           <div className="mb-4 mt-1">

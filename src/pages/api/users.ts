@@ -3,11 +3,20 @@ import type { APIContext } from "astro";
 import { connectToDatabase } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
-export async function POST({ request }: APIContext) {
-  const body = await request.json();
-  const { name, lastName, email } = body;
+const FORM_VERSION = "v1.0.0-prelaunch"
+const LANDING_VERSION = "hero-default-prelaunch"
 
-  const fullName = `${name} ${lastName}`;
+export async function POST({ request, clientAddress }: APIContext) {
+  const body = await request.json();
+  const {
+    name,
+    lastName,
+    email,
+    utm = {},
+    formVersion = FORM_VERSION,
+    landingVersion = LANDING_VERSION,
+    referrer = "",
+  } = body;
 
   const db = await connectToDatabase();
 
@@ -18,11 +27,34 @@ export async function POST({ request }: APIContext) {
       { status: 409, headers: { "Content-Type": "application/json" } }
     );
   }
-  
+
+  const fullName = `${name} ${lastName}`;
+  const userAgent = request.headers.get("user-agent") || "unknown";
+  const ip = clientAddress ?? "unknown";
+
   const result = await db.collection("users").insertOne({
+    firstName: name,
+    lastName,
     name: fullName,
     email,
-    opinion: ""
+    opinion: "",
+    createdAt: new Date(),
+    telegramJoined: true,
+    campaign: "pre-lanzamiento",
+    sentiment: null, // será calculado luego
+    status: "pre-registrado",
+    utm: {
+      source: utm.source || null,
+      medium: utm.medium || null,
+      campaign: utm.campaign || null,
+      term: utm.term || null,
+      content: utm.content || null,
+    },
+    userAgent,
+    ip,
+    referrer,
+    formVersion,
+    landingVersion,
   });
 
   return new Response(
@@ -32,11 +64,10 @@ export async function POST({ request }: APIContext) {
 }
 
 export async function PATCH({ request, params }: APIContext) {
-  const { opinion } = await request.json();
-  const userId = params.id;  // Aquí tomamos el `id` de los parámetros de la URL
+  const { opinion, sentiment = null } = await request.json();
+  const userId = params.id;
 
   const isValidObjectId = userId ? /^[a-fA-F0-9]{24}$/.test(userId) : false;
-
   if (!userId || !isValidObjectId) {
     return new Response(
       JSON.stringify({ error: "ID de usuario inválido" }),
@@ -46,28 +77,20 @@ export async function PATCH({ request, params }: APIContext) {
 
   const db = await connectToDatabase();
 
-  try {
-    // Convertir el `userId` a `ObjectId` para que sea compatible con MongoDB
-    const result = await db.collection("users").updateOne(
-      { _id: new ObjectId(userId) },
-      { $set: { opinion } }
-    );
+  const result = await db.collection("users").updateOne(
+    { _id: new ObjectId(userId) },
+    { $set: { opinion, sentiment } }
+  );
 
-    if (result.matchedCount === 0) {
-      return new Response(
-        JSON.stringify({ error: "Usuario no encontrado" }),
-        { status: 404, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
+  if (result.matchedCount === 0) {
     return new Response(
-      JSON.stringify({ success: "Usuario actualizado correctamente" }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
-  } catch (err) {
-    return new Response(
-      JSON.stringify({ error: "Error al actualizar el usuario" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({ error: "Usuario no encontrado" }),
+      { status: 404, headers: { "Content-Type": "application/json" } }
     );
   }
+
+  return new Response(
+    JSON.stringify({ success: "Usuario actualizado correctamente" }),
+    { status: 200, headers: { "Content-Type": "application/json" } }
+  );
 }

@@ -33,13 +33,15 @@ export const POST: APIRoute = async ({ request }) => {
         attributes: {
           NOMBRE: firstName,
           APELLIDOS: lastName,
+          CAMPA: 'pre-lanzamiento'
         },
         listIds: [2],
         updateEnabled: true,
       }),
     });
-
+    
     let brevoData: any = {};
+    
     try {
       const text = await brevoRes.text();
       brevoData = text ? JSON.parse(text) : {};
