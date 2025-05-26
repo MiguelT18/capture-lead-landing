@@ -1,12 +1,13 @@
 import type { APIContext } from "astro";
+import { getIp } from "@/utils/scripts";
 
 import { connectToDatabase } from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
-const FORM_VERSION = "v1.0.0-prelaunch"
-const LANDING_VERSION = "hero-default-prelaunch"
+const FORM_VERSION = "v1.0.0-prelaunch";
+const LANDING_VERSION = "hero-default-prelaunch";
 
-export async function POST({ request, clientAddress }: APIContext) {
+export async function POST({ request }: APIContext) {
   const body = await request.json();
   const {
     name,
@@ -23,14 +24,18 @@ export async function POST({ request, clientAddress }: APIContext) {
   const existingEmail = await db.collection("users").findOne({ email });
   if (existingEmail) {
     return new Response(
-      JSON.stringify({ error: "El correo electrónico ya fue usado" }),
+      JSON.stringify({
+        error: "El correo electrónico ya fue usado",
+        _id: existingEmail._id
+      }),
       { status: 409, headers: { "Content-Type": "application/json" } }
     );
   }
 
   const fullName = `${name} ${lastName}`;
   const userAgent = request.headers.get("user-agent") || "unknown";
-  const ip = clientAddress ?? "unknown";
+
+  const ip = await getIp();
 
   const result = await db.collection("users").insertOne({
     firstName: name,

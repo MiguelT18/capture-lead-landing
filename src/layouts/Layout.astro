@@ -4,6 +4,7 @@ import "../styles/global.css";
 import ToTopButton from "@components/ToTopButton.tsx";
 import Notification from "@/components/Notification.astro";
 import { GlobalIcons } from "@assets/icons.js";
+import { connectToDatabase } from "@/lib/mongodb";
 ---
 
 <!doctype html>
@@ -25,6 +26,9 @@ import { GlobalIcons } from "@assets/icons.js";
 </html>
 
 <script>
+  import { isEmbeddedBrowser } from "@utils/scripts.ts";
+
+  // Show custom event notification when the page loads
   window.addEventListener("show-notification", (event) => {
     const { type, message } = (event as CustomEvent).detail;
     const notification = document.getElementById("notification") as HTMLElement;
@@ -41,7 +45,7 @@ import { GlobalIcons } from "@assets/icons.js";
     if (spanElement) {
       spanElement.innerHTML = message;
     }
-    notification.className = `"transition-opacity duration-100 fixed bottom-5 right-5 z-50 p-4 text-sm rounded-lg shadow-md pointer-events-none opacity-0 ${notificationTypes[type as keyof typeof notificationTypes]}`;
+    notification.className = `max-w-[420px] transition-opacity duration-100 fixed bottom-5 right-5 z-50 p-4 text-sm rounded-lg shadow-md pointer-events-none opacity-0 ${notificationTypes[type as keyof typeof notificationTypes]}`;
 
     void notification.offsetWidth; // trigger reflow
 
@@ -53,6 +57,17 @@ import { GlobalIcons } from "@assets/icons.js";
       notification.classList.add("opacity-0");
     }, 3000);
   });
+
+  window.dispatchEvent(
+    new CustomEvent("show-notification", {
+      detail: {
+        type: isEmbeddedBrowser() ? "warning" : "info",
+        message: isEmbeddedBrowser()
+          ? "Estás usando un navegador embebido. Para unirte correctamente, abre la página en tu navegador."
+          : "¡Bienvenido a la Comunidad de Telegram! Aquí encontrarás recursos y noticias sobre el mundo de la tecnología.",
+      },
+    }),
+  );
 </script>
 
 <style>
