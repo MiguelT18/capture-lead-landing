@@ -45,7 +45,13 @@ import { connectToDatabase } from "@/lib/mongodb";
     if (spanElement) {
       spanElement.innerHTML = message;
     }
-    notification.className = `max-w-[420px] transition-opacity duration-100 fixed bottom-5 right-5 z-50 p-4 text-sm rounded-lg shadow-md pointer-events-none opacity-0 ${notificationTypes[type as keyof typeof notificationTypes]}`;
+    notification.className = `
+      w-[90%] sm:w-full sm:max-w-[420px]
+      transition-opacity duration-100
+      fixed bottom-5 right-1/2 sm:right-5 sm:translate-x-0 translate-x-1/2
+      z-50 p-4 text-sm rounded-lg shadow-md pointer-events-none opacity-0
+      ${notificationTypes[type as keyof typeof notificationTypes]}
+    `.trim();
 
     void notification.offsetWidth; // trigger reflow
 
@@ -57,17 +63,6 @@ import { connectToDatabase } from "@/lib/mongodb";
       notification.classList.add("opacity-0");
     }, 3000);
   });
-
-  window.dispatchEvent(
-    new CustomEvent("show-notification", {
-      detail: {
-        type: isEmbeddedBrowser() ? "warning" : "info",
-        message: isEmbeddedBrowser()
-          ? "Estás usando un navegador embebido. Para unirte correctamente, abre la página en tu navegador."
-          : "¡Bienvenido a la Comunidad de Telegram! Aquí encontrarás recursos y noticias sobre el mundo de la tecnología.",
-      },
-    }),
-  );
 </script>
 
 <style>

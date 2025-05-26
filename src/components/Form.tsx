@@ -69,7 +69,7 @@ export default function Form({ children }: any) {
       window.dispatchEvent(new CustomEvent("show-notification", {
         detail: {
           type: "warning",
-          message: "Te encuentras en un navegador embebido, por favor abre la página desde tu navegador.",
+          message: "Ups, abre esto en tu navegador normal para unirte bien.",
         }
       }));
 
