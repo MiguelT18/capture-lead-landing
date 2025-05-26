@@ -2,20 +2,32 @@ import axios from "axios";
 
 export function isEmbeddedBrowser(): boolean {
   const ua = navigator.userAgent || "";
-  const embeddedIndicators = ["FBAN", "FBAV", "Instagram", "TikTok", "Twitter", "Line", "Snapchat"];
+
+  const embeddedIndicators = [
+    "FBAN", "FBAV", "Instagram", "Line", "Snapchat",
+    "Twitter", "TikTok", "com.zhiliaoapp.musically" // TikTok alternativo
+  ];
 
   // Detección por user agent
-  const isByUserAgent = embeddedIndicators.some(indicator => ua.includes(indicator));
+  const isByUserAgent = embeddedIndicators.some(indicator =>
+    ua.toLowerCase().includes(indicator.toLowerCase())
+  );
 
-  // Detección por comportamiento anormal de navegación
+  // Detección por estar en iframe (algunos embebidos lo hacen)
   const isFramed = window.self !== window.top;
 
-  // Detección específica de TikTok
-  const isTikTokWebView = /\bcom\.zhiliaoapp\.musically\b/i.test(ua);
+  // Detección de limitaciones típicas de webviews
+  const hasLimitedFeatures = !window.matchMedia || !window.fetch;
 
-  return isByUserAgent || isFramed || isTikTokWebView;
+  // Detección por vendor/propiedades raras en TikTok (experimental)
+  const isTikTok =
+    ua.includes("ttWebView") || // Algunos identifican TikTok así
+    (typeof (navigator as any).userAgentData !== "undefined" &&
+      (navigator as any).userAgentData.brands?.some((b: any) => b.brand.includes("TikTok"))) || // Si soporta UA hints
+    /\bcom\.zhiliaoapp\.musically\b/i.test(ua); // Android
+
+  return isByUserAgent || isFramed || isTikTok || hasLimitedFeatures;
 }
-
 
 export async function getIp() {
   try {
