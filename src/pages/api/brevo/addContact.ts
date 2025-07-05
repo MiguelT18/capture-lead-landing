@@ -39,9 +39,9 @@ export const POST: APIRoute = async ({ request }) => {
         updateEnabled: true,
       }),
     });
-    
+
     let brevoData: any = {};
-    
+
     try {
       const text = await brevoRes.text();
       brevoData = text ? JSON.parse(text) : {};

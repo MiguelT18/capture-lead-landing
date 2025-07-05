@@ -3,8 +3,8 @@ import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 
 import react from "@astrojs/react";
-
 import vercel from "@astrojs/vercel";
+import db from "@astrojs/db";
 
 // https://astro.build/config
 export default defineConfig({
@@ -13,22 +13,15 @@ export default defineConfig({
   },
 
   devToolbar: {
-    enabled: false
+    enabled: false,
   },
 
-  integrations: [react()],
+  integrations: [react(), db()],
   prefetch: false,
   adapter: vercel({
     webAnalytics: {
       enabled: true,
-    }
+    },
   }),
   output: "server",
-  session: {
-    driver: "mongodb",
-    options: {
-      connectionString: import.meta.env.MONGODB_URI,
-      databaseName: import.meta.env.MONGODB_DB_NAME,
-    }
-  }
 });

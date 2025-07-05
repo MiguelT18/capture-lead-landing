@@ -1,4 +1,11 @@
-import axios from "axios";
+// Importación condicional de axios solo en el cliente
+let axios: any;
+if (typeof window !== 'undefined') {
+  // Solo importar axios en el cliente
+  import('axios').then(module => {
+    axios = module.default;
+  });
+}
 
 export function isEmbeddedBrowser(): boolean {
   const ua = navigator.userAgent || "";
@@ -31,11 +38,17 @@ export function isEmbeddedBrowser(): boolean {
 
 export async function getIp() {
   try {
-    const res = await axios.get("https://api.ipify.org?format=json");
-    const ip = res.data.ip;
-
-    return ip;
+    // Solo usar axios si está disponible (en el cliente)
+    if (typeof window !== 'undefined' && axios) {
+      const res = await axios.get("https://api.ipify.org?format=json");
+      const ip = res.data.ip;
+      return ip;
+    } else {
+      // En el servidor, retornar un valor por defecto
+      return "unknown";
+    }
   } catch (err) {
     console.error("Error al obtener la IP del usuario:", err);
+    return "unknown";
   }
 }
