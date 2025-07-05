@@ -15,7 +15,7 @@ export default defineConfig({
     enabled: false,
   },
 
-  integrations: [react(), db()],
+  integrations: [react()],
   prefetch: false,
   adapter: vercel({
     webAnalytics: {
